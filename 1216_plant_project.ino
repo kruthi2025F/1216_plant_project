@@ -1,3 +1,8 @@
+int sensorReading; 
+const int delayTIme = 1000;
+const int powerPin = 5;
+
+
 void setup() {
   Serial.begin(9600);
 
