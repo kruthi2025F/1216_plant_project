@@ -7,6 +7,7 @@ const int powerPin = 8;
 
 void setup() {
   Serial.begin(9600);
+  pinMode(powerPin, OUTPUT);
 
 }
 
