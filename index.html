@@ -33,8 +33,22 @@
 <script>
 async function checkStatus() {
     try {
-        await fetch('http://localhost:3000/data');
-        document.getElementById("status").innerText = "Connected ✔";
+        const res = await fetch('http://localhost:3000/data', {
+            cache: "no-store"
+        });
+
+        if (!res.ok) throw new Error("Bad response");
+
+        const data = await res.json();
+
+        // If we receive ANY valid response → connected
+        if (data && typeof data.moisture !== "undefined") {
+            document.getElementById("status").innerText =
+                `Connected ✔ (${data.moisture}%)`;
+        } else {
+            document.getElementById("status").innerText = "No Data ⚠️";
+        }
+
     } catch (err) {
         document.getElementById("status").innerText = "Disconnected ❌";
     }
