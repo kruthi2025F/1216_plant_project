@@ -33,6 +33,10 @@
             border-radius: 8px; 
         }
 
+        .data-box {
+            margin-top: 10px;
+            font-size: 1.1rem;
+        }
     </style>
 </head>
 
@@ -42,16 +46,20 @@
     <h1>Your Plant</h1>
     <nav>
         <a href="index.html">Home</a>
-        <a href="page2.html">About the Project</a>
+        <a href="page2.html">Your Plant</a>
     </nav>
 </header>
 
 <section>
     <h2>Live Plant Data</h2>
 
-    <div class="data-box"> Your plant's current moisture level is: <span id="moisture">Loading...</span></div>
-    <div class="data-box"> Your plant was last watered on: <span id="watered">Loading...</span></div>
-    
+    <div class="data-box">
+        🌱 Moisture Level: <span id="moisture">Loading...</span>
+    </div>
+
+    <div class="data-box">
+        💧 Last Watered: <span id="watered">Loading...</span>
+    </div>
 </section>
 
 <script>
@@ -60,10 +68,13 @@ async function fetchData() {
         const res = await fetch('http://localhost:3000/data');
         const data = await res.json();
 
-        document.getElementById('moisture').innerText = data.moisture + "%";
-        document.getElementById('watered').innerText = data.lastWatered || "Not yet";
+        document.getElementById('moisture').innerText =
+            (data.moisture !== undefined ? data.moisture : "--") + "%";
+
+        document.getElementById('watered').innerText =
+            data.lastWatered || "Not yet";
     } catch (err) {
-        console.error(err);
+        console.error("Error fetching data:", err);
     }
 }
 

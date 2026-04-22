@@ -24,9 +24,25 @@
     <section>
         <h2>About</h2>
         <p>Check up on your plant health using this website! It is linked to your automatic plant watering system</p>
-        <p2>Click the "Your Plant" tab to see when your plant was last watered and its current moisture level!</p2>
+        <p>Click the "Your Plant" tab to see when your plant was last watered and its current moisture level!</p>
 
+        <!-- NEW: connection status -->
+        <p><strong>Server Status:</strong> <span id="status">Connecting...</span></p>
     </section>
+
+<script>
+async function checkStatus() {
+    try {
+        await fetch('http://localhost:3000/data');
+        document.getElementById("status").innerText = "Connected ✔";
+    } catch (err) {
+        document.getElementById("status").innerText = "Disconnected ❌";
+    }
+}
+
+setInterval(checkStatus, 3000);
+checkStatus();
+</script>
 
 </body>
 </html>
