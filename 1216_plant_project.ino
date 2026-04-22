@@ -11,6 +11,10 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  digitalWrite(powerpin, HIGH);
+  sensor = analogRead(A0);
+  digitalWrite(powerpin, LOW);
+  Serial.println(sensor);
+  delay(delayTime);
 
 }
