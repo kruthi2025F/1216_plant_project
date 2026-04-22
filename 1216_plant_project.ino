@@ -1,5 +1,5 @@
-int sensorReading; 
-const int delayTIme = 1000;
+int sensor; 
+const int delayTime = 1000;
 
 // pin number for turning the sensor it on and off
 const int powerPin = 8;
@@ -11,9 +11,9 @@ void setup() {
 }
 
 void loop() {
-  digitalWrite(powerpin, HIGH);
+  digitalWrite(powerPin, HIGH);
   sensor = analogRead(A0);
-  digitalWrite(powerpin, LOW);
+  digitalWrite(powerPin, LOW);
   Serial.println(sensor);
   delay(delayTime);
 
