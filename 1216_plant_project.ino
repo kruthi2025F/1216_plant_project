@@ -1,5 +1,7 @@
 int sensorReading; 
 const int delayTIme = 1000;
+
+// pin number for turning the sensor it on and off
 const int powerPin = 5;
 
 
