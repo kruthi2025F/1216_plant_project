@@ -13,6 +13,7 @@ void setup() {
 
 void loop() {
   digitalWrite(powerPin, HIGH);
+  delay(100);
   sensor = analogRead(A0);
   digitalWrite(powerPin, LOW);
   Serial.println(sensor);
