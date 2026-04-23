@@ -26,14 +26,14 @@
         <p>Check up on your plant health using this website! It is linked to your automatic plant watering system</p>
         <p>Click the "Your Plant" tab to see when your plant was last watered and its current moisture level!</p>
 
-        <!-- NEW: connection status -->
         <p><strong>Server Status:</strong> <span id="status">Connecting...</span></p>
+        <p><strong>Soil Moisture (raw):</strong> <span id="moisture">—</span></p>
     </section>
 
 <script>
 async function checkStatus() {
     try {
-        const res = await fetch('http://localhost:3000/data', {
+        const res = await fetch('/data', {   // fixed: was localhost:3000
             cache: "no-store"
         });
 
@@ -41,10 +41,9 @@ async function checkStatus() {
 
         const data = await res.json();
 
-        // If we receive ANY valid response → connected
-        if (data && typeof data.moisture !== "undefined") {
-            document.getElementById("status").innerText =
-                `Connected ✔ (${data.moisture}%)`;
+        if (data && data.sensor !== null && data.sensor !== undefined) {
+            document.getElementById("status").innerText = "Connected ✔";
+            document.getElementById("moisture").innerText = data.sensor;  // fixed: was data.moisture
         } else {
             document.getElementById("status").innerText = "No Data ⚠️";
         }
