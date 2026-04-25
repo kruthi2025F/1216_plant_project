@@ -28,14 +28,20 @@
 
         <p><strong>Server Status:</strong> <span id="status">Connecting...</span></p>
         <p><strong>Soil Moisture (raw):</strong> <span id="moisture">—</span></p>
+        <p><strong>Last Watered:</strong> 2 hours ago</p>
         <p>Key: 0–300 for dry soil, 300–700 for humid, and 700–950 in water, with 1023 indicating extreme dryness.</p>
         <p>Different plants have different optimal moisture levels. ex: for a spider plant, 400-600 is optimal</p>
+
+        <p>
+            <label for="desiredMoisture"><strong>Desired Soil Moisture Level:</strong></label>
+            <input type="number" id="desiredMoisture" min="0" max="1023" placeholder="e.g. 500" style="width: 80px; margin-left: 8px;">
+        </p>
     </section>
 
 <script>
 async function checkStatus() {
     try {
-        const res = await fetch('/data', {   // fixed: was localhost:3000
+        const res = await fetch('/data', {
             cache: "no-store"
         });
 
@@ -45,7 +51,7 @@ async function checkStatus() {
 
         if (data && data.sensor !== null && data.sensor !== undefined) {
             document.getElementById("status").innerText = "Connected ✔";
-            document.getElementById("moisture").innerText = data.sensor;  // fixed: was data.moisture
+            document.getElementById("moisture").innerText = data.sensor;
         } else {
             document.getElementById("status").innerText = "No Data ⚠️";
         }
