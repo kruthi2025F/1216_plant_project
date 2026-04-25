@@ -1,68 +1,134 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Website</title>
-    <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 0; padding: 20px; background-color: #f4f4f4; }
-        header { background: #333; color: #fff; padding: 1rem; text-align: center; }
-        nav a { color: white; margin: 0 10px; text-decoration: none; }
-        section { background: #b3dfbb; padding: 20px; margin-top: 10px; border-radius: 8px; }
-    </style>
+<meta charset="UTF-8">
+<title>Automatic Plant Watering System</title>
+
+<style>
+/* Basic page layout and typography */
+body { font-family: Arial; margin: 0; padding: 20px; background: #f4f4f4; }
+
+/* Styling for the top navigation/header area */
+header { background: #333; color: white; padding: 1rem; text-align: center; }
+
+/* Card-like styling for the main content area */
+section { background: #b3dfbb; padding: 20px; margin-top: 10px; border-radius: 8px; }
+
+/* Interactive button styling */
+button {
+    background: #2e7d32;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* Hover effect to make buttons feel responsive */
+button:hover { background: #1b5e20; }
+
+/* Standard width for the threshold input boxes */
+input { width: 80px; }
+</style>
 </head>
+
 <body>
 
-    <header>
-        <h1>Automatic Plant Watering System</h1>
-        <nav>
-            <a href="index.html">Home</a>
-            <a href="page2.html">Your Plant</a>
-        </nav>
-    </header>
+<header>
+<h1>Automatic Plant Watering System</h1>
+</header>
 
-    <section>
-        <h2>About</h2>
-        <p>Check up on your plant health using this website! It is linked to your automatic plant watering system</p>
-        <p>Click the "Your Plant" tab to see when your plant was last watered and its current moisture level!</p>
+<section>
 
-        <p><strong>Server Status:</strong> <span id="status">Connecting...</span></p>
-        <p><strong>Soil Moisture (raw):</strong> <span id="moisture">—</span></p>
-        <p><strong>Last Watered:</strong> 2 hours ago</p>
-        <p>Key: 0–300 for dry soil, 300–700 for humid, and 700–950 in water, with 1023 indicating extreme dryness.</p>
-        <p>Different plants have different optimal moisture levels. ex: for a spider plant, 400-600 is optimal</p>
+<h2>About</h2>
 
-        <p>
-            <label for="desiredMoisture"><strong>Desired Soil Moisture Level:</strong></label>
-            <input type="number" id="desiredMoisture" min="0" max="1023" placeholder="e.g. 500" style="width: 80px; margin-left: 8px;">
-        </p>
-    </section>
+<p>
+Check up on your plant health using this website! It is linked to your automatic plant watering system
+</p>
+
+<p><strong>Server Status:</strong> <span id="status">...</span></p>
+<p><strong>Soil Moisture:</strong> <span id="moisture">—</span></p>
+<p><strong>Last Watered:</strong> <span id="lastWatered">—</span></p>
+
+<p><strong>Soil Moisture Guide:</strong></p>
+<ul>
+<li>300–450 → Very wet</li>
+<li>450–600 → Ideal (Spider plant 🌿)</li>
+<li>600–800 → Dry</li>
+<li>1023 → Error</li>
+</ul>
+
+<p>
+Min: <input id="min" type="number" value="400">
+Max: <input id="max" type="number" value="600">
+<button onclick="saveRange()">Save</button>
+</p>
+
+<button onclick="waterPlant()">💧 Water Plant</button>
+<p id="msg"></p>
+
+</section>
 
 <script>
+
+/**
+ * Fetches current sensor and connection data from the Flask server
+ * and updates the UI elements.
+ */
 async function checkStatus() {
     try {
-        const res = await fetch('/data', {
-            cache: "no-store"
-        });
-
-        if (!res.ok) throw new Error("Bad response");
-
+        const res = await fetch('/data');
         const data = await res.json();
 
-        if (data && data.sensor !== null && data.sensor !== undefined) {
-            document.getElementById("status").innerText = "Connected ✔";
-            document.getElementById("moisture").innerText = data.sensor;
-        } else {
-            document.getElementById("status").innerText = "No Data ⚠️";
-        }
+        // Update Connection Status
+        document.getElementById("status").innerText =
+            data.connected ? "Connected ✔" : "Disconnected ❌";
+
+        // Update Soil Moisture (using Nullish Coalescing for empty values)
+        document.getElementById("moisture").innerText =
+            data.sensor ?? "—";
+
+        // Update Timestamp of last watering
+        document.getElementById("lastWatered").innerText =
+            data.last_water_at ?? "Never";
 
     } catch (err) {
-        document.getElementById("status").innerText = "Disconnected ❌";
+        console.log("Frontend error:", err);
     }
 }
 
+/**
+ * Sends the user-defined min/max moisture levels to the server
+ */
+async function saveRange() {
+    await fetch('/set_range', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            min: document.getElementById("min").value,
+            max: document.getElementById("max").value
+        })
+    });
+}
+
+/**
+ * Requests the server to trigger the physical pump immediately
+ */
+async function waterPlant() {
+    const res = await fetch('/water', { method: 'POST' });
+    const data = await res.json();
+
+    // Show feedback to the user on success or failure
+    document.getElementById("msg").innerText =
+        data.success ? "Watered ✔" : "Error ❌";
+}
+
+// Automatically refresh data every 3 seconds
 setInterval(checkStatus, 3000);
+
+// Run initial check immediately on page load
 checkStatus();
+
 </script>
 
 </body>
